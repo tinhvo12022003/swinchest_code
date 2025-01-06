@@ -6,14 +6,16 @@ import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score
 
 class Trainer:
-    def __init__(self, model, criterion, optimizer, train_dataloader, val_dataloader, num_epochs, device, patience=5):
-        self.model = model
+    def __init__(self, model, criterion, optimizer, train_dataloader, val_dataloader, num_epochs, device, patience=5, device_ids=None):
+        if device_ids is None:
+            device_ids = list(range(torch.cuda.device_count()))
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = torch.nn.DataParallel(model, device_ids=device_ids).to(self.device)
         self.criterion = criterion
         self.optimizer = optimizer
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
         self.num_epochs = num_epochs
-        self.device = device
         self.best_val_loss = float('inf')
         self.patience = patience
         self.patience_counter = 0
