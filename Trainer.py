@@ -56,7 +56,7 @@ class Trainer:
         threshold = 0.5
 
         with torch.no_grad():
-            for batch in dataloader:
+            for batch in tqdm(dataloader):
                 images = batch['pixel_values'].to(self.device)
                 labels = batch['label'].to(self.device)
                 outputs = self.model(images)
